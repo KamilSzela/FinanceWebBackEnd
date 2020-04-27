@@ -67,8 +67,17 @@
 					<input class="form-control" id="email" type="text" name="email" placeholder="Email"></input>
 				</div>
 				
-				<div class="col-sm-12 text-center text-danger mb-2" id="loginFunctionMessage"></div>
-				<input type="submit" id="signIn" class="btn btn-primary btn-block mb-2">Zaloguj się</input>
+				<div class="col-sm-12 text-center text-danger mb-2" id="loginFunctionMessage"><?php
+					if(isset($_SESSION['login_error'])){
+						echo '<p>'.$_SESSION['login_error'].'</p>';
+						unset($_SESSION['login_error']);
+					}
+					if(isset($_SESSION['password_error'])){
+						echo '<p>'.$_SESSION['password_error'].'</p>';
+						unset($_SESSION['password_error']);
+					}
+				?></div>
+				<input type="submit" id="signIn" class="btn btn-primary btn-block mb-2" value="Zaloguj się"></input>
 			</form>
 				<p class="mb-2">Nie masz jeszcze konta - zarejestruj się !</p>
 				<a href="register.php" id="signUp" class="btn btn-primary btn-block mb-2">Zarejestruj się</a> 
