@@ -7,6 +7,9 @@ body
 .container{
 	/*background-color:#ccc5c5;*/
 }
+.h-500{
+	height:500px;
+}
 .fa-22-font{
 	font-size:22px;
 	width: 45px;
