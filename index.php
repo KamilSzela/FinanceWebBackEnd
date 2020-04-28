@@ -1,5 +1,10 @@
 <?php
 	session_start();
+	if(isset($_SESSION['logged_User_Id'])){
+		//echo '<p>Działa</p>';
+		//header('Location:main.php');
+		//exit();
+	}
 ?>
 <!DOCTYPE html>
 <html lang="pl">
@@ -75,6 +80,10 @@
 					if(isset($_SESSION['password_error'])){
 						echo '<p>'.$_SESSION['password_error'].'</p>';
 						unset($_SESSION['password_error']);
+					}
+					if(isset($_SESSION['email_error'])){
+						echo '<p>'.$_SESSION['email_error'].'</p>';
+						unset($_SESSION['email_error']);
 					}
 				?></div>
 				<input type="submit" id="signIn" class="btn btn-primary btn-block mb-2" value="Zaloguj się"></input>
