@@ -20,7 +20,7 @@
 		$email_After_Validation = filter_var($email_After_Sanitization, FILTER_VALIDATE_EMAIL);
 		
 		if(($email_After_Validation == false) || ($email_After_Sanitization != $email)){
-			$wszystko_ok = false;
+			$successful_validation = false;
 			$_SESSION['email_error'] = "Podaj poprawny adres email";
 		}
 		
@@ -28,28 +28,62 @@
 		$password_Repeat = $_POST['password2'];
 		
 		if(strlen($password)<8 || strlen($password)>20){
-			$wszystko_ok = false;
+			$successful_validation = false;
 			$_SESSION['password_error'] = "Hasło musi posiadać od 8 do 20 znaków";
 		}
 		
 		if($password != $password_Repeat){
-			$wszystko_ok = false;
+			$successful_validation = false;
 			$_SESSION['password_error'] = "Podane hasła nie są identyczne";
 		}
 		
-		if($wszystko_ok == true){
+		if($successful_validation == true){
 		
-			$haslo_hash = password_hash($password, PASSWORD_DEFAULT);
+			$password_hash = password_hash($password, PASSWORD_DEFAULT);
 			
 			require_once 'database.php';
 			
 			try{
-				$userQuery = $db->prepare('SELECT id FROM users WHERE email = :email');
-				$userQuery->bindValue(':email', $login, PDO::PARAM_STR);
-				$userQuery->execute();
+				//check if email already exists
+				$check_Query = $db->prepare('SELECT id FROM users WHERE email = :email');
+				$check_Query->bindValue(':email', $email_After_Validation, PDO::PARAM_STR);
+				$check_Query->execute();
+				
+				$how_many_identical_mails = $check_Query->rowCount();
+				
+				if($how_many_identical_mails>0){
+					$successful_validation = false;
+					$_SESSION['email_error'] = "Istnieje już konto przypisane do tego adresu e-mail";
+				}
+				
+				//check if login already exists
+				$check_Query = $db->prepare('SELECT id FROM users WHERE username = :login');
+				$check_Query->bindValue(':login', $login, PDO::PARAM_STR);
+				$check_Query->execute();
+				
+				$how_many_identical_logins = $check_Query->rowCount();
+				
+				if($how_many_identical_logins>0){
+					$successful_validation = false;
+					$_SESSION['login_error'] = "Istnieje już konto o podanym loginie";
+				}
+				
+				if($successful_validation == true){
+					$check_Query = $db->prepare('INSERT INTO users VALUES (NULL, :username, :password, :email)');
+					$check_Query->bindValue(':username', $login, PDO::PARAM_STR);
+					$check_Query->bindValue(':password', $password_hash, PDO::PARAM_STR);
+					$check_Query->bindValue(':email', $email_After_Validation, PDO::PARAM_STR);
+					$check_Query->execute();
+					/*if($insert_Query == true){
+						$_SESSION['successful_registration']=true;
+						echo 'zarejestrowałeś się - oooooooooooo';
+						//header('Location:main.php');
+					}*/
+				}
 				
 			}
 			catch(PDOException $e){
+				echo "<span style=\"color:red;\">". $e->getCode().'  '. $e->getMessage().'</span><br/>'; 
 				echo "<span style=\"color:red;\">Błąd serwera! Przepraszamy za niedogodności i prosimy o rejestracje w innym terminie!</span>";
 			}
 		}
