@@ -69,11 +69,25 @@
 				}
 				
 				if($successful_validation == true){
-					$check_Query = $db->prepare('INSERT INTO users VALUES (NULL, :username, :password, :email)');
-					$check_Query->bindValue(':username', $login, PDO::PARAM_STR);
-					$check_Query->bindValue(':password', $password_hash, PDO::PARAM_STR);
-					$check_Query->bindValue(':email', $email_After_Validation, PDO::PARAM_STR);
+					$insert_Query = $db->prepare('INSERT INTO users VALUES (NULL, :username, :password, :email)');
+					$insert_Query->bindValue(':username', $login, PDO::PARAM_STR);
+					$insert_Query->bindValue(':password', $password_hash, PDO::PARAM_STR);
+					$insert_Query->bindValue(':email', $email_After_Validation, PDO::PARAM_STR);
+					$insert_Query->execute();
+					
+					$check_Query = $db->prepare('SELECT id FROM users WHERE username = :login');
+					$check_Query->bindValue(':login', $login, PDO::PARAM_STR);
 					$check_Query->execute();
+					
+					$result = $check_Query->fetch();
+					
+					$user_id = $result['id'];
+					
+					$insert_Query2 = $db->exec("INSERT INTO expenses_category_assigned_to_users VALUES (null, '$user_id','Jedzenie'),(null, '$user_id', 'Mieszkanie'),(null, '$user_id','Transport'),(null, '$user_id','Telekomunikacja'),(null, '$user_id','Opieka zdrowotna'),(null, '$user_id','Ubranie'),(null, '$user_id','Higiena'),(null, '$user_id','Dzieci'),(null, '$user_id','Rozrywka'),(null, '$user_id','Wycieczka'),(null, '$user_id','Szkolenia'),(null, '$user_id','Książki'),(null, '$user_id','Oszczędności'),(null, '$user_id','Darowizna'),(null, '$user_id','Spłata długów'),(null, '$user_id','Na złotą jesien, czyli emeryturę'),(null, '$user_id','Inne wydatki')");
+					
+					$insert_Query3 = $db->exec("INSERT INTO incomes_category_assigned_to_users VALUES (null, '$user_id','Wynagrodzenie'),(null, '$user_id','Odsetki bankowe'),(null, '$user_id','Sprzedaż na Allegro'),(null, '$user_id','Inne źródło')");
+					
+					$insert_Query4 = $db->exec("INSERT INTO payment_methods_assigned_to_users VALUES (null, '$user_id','Gotówka'),(null, '$user_id','Karta Debetowa'),(null, '$user_id','Karta Kredytowa');");
 					/*if($insert_Query == true){
 						$_SESSION['successful_registration']=true;
 						echo 'zarejestrowałeś się - oooooooooooo';
