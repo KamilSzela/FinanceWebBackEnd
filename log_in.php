@@ -6,6 +6,11 @@
 			header('Location:index.php');
 			exit();
 		}
+		if($_POST['login']==""||$_POST['password']==""||$_POST['email']==""){
+			$_SESSION['login_error']="Nie wprowadzono wszystkich wymaganych danych";
+			header('Location: index.php');
+			exit();
+		}
 		//echo $_POST['login'].' '.$_POST['password'];
 		//echo 'log_in.php';
 		require_once 'database.php';
@@ -42,7 +47,6 @@
 			if(password_verify($password, $user['password'])){
 				$_SESSION['logged_User_Id'] = $user['id'];
 				header('Location: main.php');
-				echo 'Poprawne logowanie';
 			} else {
 				//invalid login attempt
 				$_SESSION['password_error'] = 'Podano błędne hasło';
@@ -55,5 +59,10 @@
 			header('Location: index.php');
 			exit();
 		}
+	}
+	else{
+		//header('Location: main.php');
+		//echo $_SESSION['logged_User_Id'].'coooooooo';
+		exit();
 	}
 ?>

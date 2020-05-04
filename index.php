@@ -1,9 +1,8 @@
 <?php
 	session_start();
 	if(isset($_SESSION['logged_User_Id'])){
-		//echo '<p>Działa</p>';
-		//header('Location:main.php');
-		//exit();
+		header('Location:main.php');
+		exit();
 	}
 ?>
 <!DOCTYPE html>
