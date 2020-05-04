@@ -10,5 +10,6 @@
 		]);
 		
 	} catch(PDOException $error){
+		//echo $error->getCode().'<br/>';
 		exit('Database error');
 	}

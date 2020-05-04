@@ -7,6 +7,9 @@ body
 .container{
 	/*background-color:#ccc5c5;*/
 }
+.h-register{
+	height:435px;
+}
 .fa-22-font{
 	font-size:22px;
 	width: 45px;
@@ -41,4 +44,7 @@ body
 }
 .font-2rem{
 	font-size: 2rem;
+}
+.pt-11{
+	padding-top:11px;
 }
