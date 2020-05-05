@@ -5,7 +5,15 @@
 		exit();
 	}
 	
-	$_SESSION['added_income_message'] = '<p class="text-success">submitted by button'.$_POST['incomeAmount'].'||'.$_POST['dateIncome'].'||'.$_POST['incomeCategory'].'||'.$_POST['commentIncome'].'||'.'</p>';
+	if(isset($_POST['incomeAmount'])){
+		$incomeAmount = preg_replace("/[^0-9.,]/", "", $_POST['incomeAmount']);
+		if($incomeAmount!=$_POST['incomeAmount']){
+			$_SESSION['added_income_message'] = 'Kwota dochodu powinna zawierać jedynie cyfry i znak "."';
+			//exit();
+		}
+
+		//$_SESSION['added_income_message'] = '<p class="text-success">submitted by button'.$_POST['incomeAmount'].'||'.$_POST['dateIncome'].'||'.$_POST['incomeCategory'].'||'.$_POST['commentIncome'].'||'.$incomeAmount.'</p>';
+	}
 ?>
 
 <!DOCTYPE html>
