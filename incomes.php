@@ -4,14 +4,38 @@
 		header('Location:index.php');
 		exit();
 	}
-	
+	$invalidData = false;
 	if(isset($_POST['incomeAmount'])){
 		$incomeAmount = preg_replace("/[^0-9.,]/", "", $_POST['incomeAmount']);
+		
 		if($incomeAmount!=$_POST['incomeAmount']){
-			$_SESSION['added_income_message'] = 'Kwota dochodu powinna zawierać jedynie cyfry i znak "."';
-			//exit();
+			$_SESSION['added_income_message'] = 'Kwota dochodu powinna zawierać jedynie cyfry i znak "." lub ","';
+			$invalidData = true;
 		}
-
+		
+		if($invalidData==false){
+			$incomeAmountCommaReplacement = str_replace(',','.',$incomeAmount);
+			$incomeFloatFormat = floatval($incomeAmountCommaReplacement);
+			//$checktype = is_float($incomeDoubleFormat);
+			//$_SESSION['added_income_message'] = 'czy float:'.$checktype.', wartość:'.$incomeDoubleFormat;
+		}	
+		if($invalidData==false){
+			$dateValue = preg_replace("/[^0-9\-]/","",$_POST['dateIncome']);
+			if($dateValue!=$_POST['dateIncome']){
+				$invalidData = true;
+				$_SESSION['added_income_message'] = 'Proszę wpisać datę w formacie rrrr-mm-dd';
+			}
+		}
+			
+		if($invalidData==false){
+			$comment = filter_input(INPUT_POST, 'commentIncome', FILTER_SANITIZE_SPECIAL_CHARS);
+			
+			require_once 'database.php';
+			
+			$userId = $_SESSION['logged_User_Id'];
+			$cathegory_assigned_to_user = $_POST['incomeCategory'];
+			$insert_income_query = $db->exec("INSERT INTO incomes VALUES(NULL, '$userId', '$cathegory_assigned_to_user', '$incomeFloatFormat','$dateValue','$comment')");
+		}
 		//$_SESSION['added_income_message'] = '<p class="text-success">submitted by button'.$_POST['incomeAmount'].'||'.$_POST['dateIncome'].'||'.$_POST['incomeCategory'].'||'.$_POST['commentIncome'].'||'.$incomeAmount.'</p>';
 	}
 ?>
@@ -91,19 +115,19 @@
 								<div id="incomeCategory" class="form-group">
 									<p>Kategoria:</p>
 									<div id="Wynagrodzenie" class="custom-control custom-radio">
-										<input type="radio" class="custom-control-input" id="salary" value="Wynagrodzenie" name="incomeCategory" checked>  
+										<input type="radio" class="custom-control-input" id="salary" value="1" name="incomeCategory" checked>  
 										<label class="custom-control-label" for="salary"> Wynagrodzenie</label>
 									</div>
 									<div id="Odsetkibankowe" class="custom-control custom-radio">
-										<input type="radio" class="custom-control-input" id="intrests" value="Odsetki bankowe" name="incomeCategory">
+										<input type="radio" class="custom-control-input" id="intrests" value="2" name="incomeCategory">
 										<label class="custom-control-label" for="intrests"> Odsetki bankowe</label>
 									</div>
 									<div id="SprzedażnaAllegro" class="custom-control custom-radio">
-										<input type="radio" class="custom-control-input" id="allegroSell" value="Sprzedaż na Allegro" name="incomeCategory">
+										<input type="radio" class="custom-control-input" id="allegroSell" value="3" name="incomeCategory">
 										<label class="custom-control-label" for="allegroSell">Sprzedaż na Allegro </label>
 									</div>
 									<div id="Inneźródło" class="custom-control custom-radio">
-										<input type="radio" class="custom-control-input" id="otherIncomeCat" value="Inne źródło" name="incomeCategory">
+										<input type="radio" class="custom-control-input" id="otherIncomeCat" value="4" name="incomeCategory">
 										<label class="custom-control-label" for="otherIncomeCat"> Inne źródło </label>
 									</div>
 									
