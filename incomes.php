@@ -1,9 +1,20 @@
 <?php
 	session_start();
-	if(!isset($_SESSION['logged_User_Id'])){
+	if(isset($_SESSION['logged_User_Id'])==false){
 		header('Location:index.php');
 		exit();
 	}
+	if(isset($_SESSION['logged_User_Id'])==true){
+		require_once 'database.php';
+		$user_id = $_SESSION['logged_User_Id'];
+		$get_cathegories_Query = $db->prepare('SELECT id,name FROM incomes_category_assigned_to_users WHERE user_id = :id');
+		$get_cathegories_Query->bindValue(':id', $user_id, PDO::PARAM_INT);
+		$get_cathegories_Query->execute();
+	
+		$users_cathegories = $get_cathegories_Query->fetchAll();
+		
+	}
+	
 	$invalidData = false;
 	if(isset($_POST['incomeAmount'])){
 		$incomeAmount = preg_replace("/[^0-9.,]/", "", $_POST['incomeAmount']);
@@ -30,7 +41,7 @@
 		if($invalidData==false){
 			$comment = filter_input(INPUT_POST, 'commentIncome', FILTER_SANITIZE_SPECIAL_CHARS);
 			
-			require_once 'database.php';
+			//require_once 'database.php';
 			
 			$userId = $_SESSION['logged_User_Id'];
 			$cathegory_assigned_to_user = $_POST['incomeCategory'];
@@ -114,22 +125,18 @@
 							<div class="col-sm-12 mb-2 border border-success">
 								<div id="incomeCategory" class="form-group">
 									<p>Kategoria:</p>
-									<div id="Wynagrodzenie" class="custom-control custom-radio">
-										<input type="radio" class="custom-control-input" id="salary" value="1" name="incomeCategory" checked>  
-										<label class="custom-control-label" for="salary"> Wynagrodzenie</label>
-									</div>
-									<div id="Odsetkibankowe" class="custom-control custom-radio">
-										<input type="radio" class="custom-control-input" id="intrests" value="2" name="incomeCategory">
-										<label class="custom-control-label" for="intrests"> Odsetki bankowe</label>
-									</div>
-									<div id="SprzedażnaAllegro" class="custom-control custom-radio">
-										<input type="radio" class="custom-control-input" id="allegroSell" value="3" name="incomeCategory">
-										<label class="custom-control-label" for="allegroSell">Sprzedaż na Allegro </label>
-									</div>
-									<div id="Inneźródło" class="custom-control custom-radio">
-										<input type="radio" class="custom-control-input" id="otherIncomeCat" value="4" name="incomeCategory">
-										<label class="custom-control-label" for="otherIncomeCat"> Inne źródło </label>
-									</div>
+								
+								
+									<?php
+										foreach($users_cathegories as $cathegorie){
+											echo '<div class="custom-control custom-radio">';
+											echo '<input type="radio" class="custom-control-input" id="'.$cathegorie['name'] .'" value="'.$cathegorie['id'].'" name="incomeCategory">';
+											echo '<label class="custom-control-label" for="'.$cathegorie['name'].'">'.$cathegorie['name'].'</label>';
+											echo '</div>';
+										}
+										
+									?>
+									
 									
 								</div>
 							</div>
