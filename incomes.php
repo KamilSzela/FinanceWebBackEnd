@@ -4,22 +4,22 @@
 		header('Location:index.php');
 		exit();
 	}
-	if(isset($_SESSION['logged_User_Id'])==true){
+	else{
 		require_once 'database.php';
 		$user_id = $_SESSION['logged_User_Id'];
 		$get_cathegories_Query = $db->prepare('SELECT id,name FROM incomes_category_assigned_to_users WHERE user_id = :id');
 		$get_cathegories_Query->bindValue(':id', $user_id, PDO::PARAM_INT);
 		$get_cathegories_Query->execute();
 	
-		$users_cathegories = $get_cathegories_Query->fetchAll();
-		
+		$users_cathegories = $get_cathegories_Query->fetchAll();		
 	}
 	
 	$invalidData = false;
+
 	if(isset($_POST['incomeAmount'])){
 		$incomeAmount = preg_replace("/[^0-9.,]/", "", $_POST['incomeAmount']);
 		
-		if($incomeAmount!=$_POST['incomeAmount']){
+		if($incomeAmount!=$_POST['incomeAmount']||$incomeAmount==""){
 			$_SESSION['added_income_message'] = 'Kwota dochodu powinna zawierać jedynie cyfry i znak "." lub ","';
 			$invalidData = true;
 		}
@@ -30,25 +30,39 @@
 			//$checktype = is_float($incomeDoubleFormat);
 			//$_SESSION['added_income_message'] = 'czy float:'.$checktype.', wartość:'.$incomeDoubleFormat;
 		}	
+		$_SESSION['loaded_amount']=$incomeAmountCommaReplacement;
 		if($invalidData==false){
 			$dateValue = preg_replace("/[^0-9\-]/","",$_POST['dateIncome']);
-			if($dateValue!=$_POST['dateIncome']){
+			if($dateValue!=$_POST['dateIncome']||$dateValue==""){
 				$invalidData = true;
 				$_SESSION['added_income_message'] = 'Proszę wpisać datę w formacie rrrr-mm-dd';
 			}
 		}
-			
+		$_SESSION['loaded_date']=$dateValue;
+		if(!isset($_POST['incomeCategory'])){
+			$invalidData = true;
+			$_SESSION['added_income_message'] = 'Proszę wybrać kategorię wydatku';
+		}
+		$_SESSION['loaded_comment']=$_POST['commentIncome'];
 		if($invalidData==false){
-			$comment = filter_input(INPUT_POST, 'commentIncome', FILTER_SANITIZE_SPECIAL_CHARS);
-			
-			//require_once 'database.php';
-			
-			$userId = $_SESSION['logged_User_Id'];
-			$cathegory_assigned_to_user = $_POST['incomeCategory'];
-			$insert_income_query = $db->exec("INSERT INTO incomes VALUES(NULL, '$userId', '$cathegory_assigned_to_user', '$incomeFloatFormat','$dateValue','$comment')");
+				$userId = $_SESSION['logged_User_Id'];
+				$cathegory_assigned_to_user = $_POST['incomeCategory'];
+			if(isset($_POST['commentIncome'])&&$_POST['commentIncome']!=""){
+				$comment = filter_input(INPUT_POST, 'commentIncome', FILTER_SANITIZE_SPECIAL_CHARS);
+				$insert_income_query = $db->exec("INSERT INTO incomes VALUES(NULL, '$userId', '$cathegory_assigned_to_user', '$incomeFloatFormat','$dateValue','$comment')");
+				$_SESSION['added_income_message'] = '<p class="text-success">Dodano nowy dochód do Twojej bazy danych!</p>';
+			}
+			else{
+				$insert_income_query = $db->exec("INSERT INTO incomes VALUES(NULL, '$userId', '$cathegory_assigned_to_user', '$incomeFloatFormat','$dateValue',\"\")");
+				$_SESSION['added_income_message'] = '<p class="text-success">Dodano nowy dochód do Twojej bazy danych!</p>';
+			}
+			unset($_SESSION['loaded_amount']);
+			unset($_SESSION['loaded_amount']);
+			unset($_SESSION['loaded_comment']);
 		}
 		//$_SESSION['added_income_message'] = '<p class="text-success">submitted by button'.$_POST['incomeAmount'].'||'.$_POST['dateIncome'].'||'.$_POST['incomeCategory'].'||'.$_POST['commentIncome'].'||'.$incomeAmount.'</p>';
 	}
+
 ?>
 
 <!DOCTYPE html>
@@ -110,7 +124,10 @@
 							<div class="col-sm-12 mb-2">
 								<p>Kwota dochodu: </p>
 								<div class="input-group">
-									<input type="text" class="form-control" placeholder="Podaj kwotę dochodu" name="incomeAmount">
+									<input type="text" class="form-control" placeholder="Podaj kwotę dochodu" name="incomeAmount" <?=
+											isset($_SESSION['loaded_amount'])?
+											'value="'.$_SESSION['loaded_amount'].'"' : ''
+									?>>
 									<div class="input-group-append">
 										<span class="input-group-text"> PLN </span>
 									</div>
@@ -119,7 +136,10 @@
 							<div class="col-sm-12 mb-2">
 								<div class="form-group">
 									<p>Data dochodu:</p>
-									<input type="date" id="dateIncome" class="form-control" name="dateIncome">
+									<input type="date" id="dateIncome" class="form-control" name="dateIncome" <?=
+											isset($_SESSION['loaded_date'])?
+											'value="'.$_SESSION['loaded_date'].'"' : ''
+									?>>
 								</div>
 							</div>
 							<div class="col-sm-12 mb-2 border border-success">
@@ -143,7 +163,10 @@
 							<div class="col-sm-12 mb-2">
 								<div class="form-group">
 									<p>Komentarz(opcjonalnie):</p>
-									<textarea id="commentIncome" class="form-control" placeholder="" name="commentIncome"></textarea>
+									<textarea id="commentIncome" class="form-control" placeholder="" name="commentIncome" <?=
+											isset($_SESSION['loaded_comment'])?
+											'value="'.$_SESSION['loaded_comment'].'"' : ''
+									?>></textarea>
 								</div>
 							</div>
 							<div id="addIncomeFunctionMessage" class="text-danger col-sm-12 text-center mb-2">
