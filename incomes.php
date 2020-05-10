@@ -57,7 +57,7 @@
 				$_SESSION['added_income_message'] = '<p class="text-success">Dodano nowy dochód do Twojej bazy danych!</p>';
 			}
 			unset($_SESSION['loaded_amount']);
-			unset($_SESSION['loaded_amount']);
+			unset($_SESSION['loaded_date']);
 			unset($_SESSION['loaded_comment']);
 		}
 		//$_SESSION['added_income_message'] = '<p class="text-success">submitted by button'.$_POST['incomeAmount'].'||'.$_POST['dateIncome'].'||'.$_POST['incomeCategory'].'||'.$_POST['commentIncome'].'||'.$incomeAmount.'</p>';
@@ -109,8 +109,7 @@
 							<li class="nav-item w-20" id="log-out"><a class="nav-link" href="logout.php">Wyloguj <span class="fa fa-sign-out"></span></a></li>
 						  </ul>
 						</div>
-					</nav>
-				
+					</nav>				
 			</div>
 			<div class="col-sm-12">		
 				
@@ -144,20 +143,15 @@
 							</div>
 							<div class="col-sm-12 mb-2 border border-success">
 								<div id="incomeCategory" class="form-group">
-									<p>Kategoria:</p>
-								
-								
+									<p>Kategoria:</p>							
 									<?php
 										foreach($users_cathegories as $cathegorie){
 											echo '<div class="custom-control custom-radio">';
 											echo '<input type="radio" class="custom-control-input" id="'.$cathegorie['name'] .'" value="'.$cathegorie['id'].'" name="incomeCategory">';
 											echo '<label class="custom-control-label" for="'.$cathegorie['name'].'">'.$cathegorie['name'].'</label>';
 											echo '</div>';
-										}
-										
-									?>
-									
-									
+										}										
+									?>	
 								</div>
 							</div>
 							<div class="col-sm-12 mb-2">
@@ -184,11 +178,9 @@
 					</form>
 						
 					</div>
-				</div>
-				
+				</div>				
 			</div>
-		</div>
-		
+		</div>		
 	</div>
 	
 	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
