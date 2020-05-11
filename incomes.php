@@ -157,10 +157,10 @@
 							<div class="col-sm-12 mb-2">
 								<div class="form-group">
 									<p>Komentarz(opcjonalnie):</p>
-									<textarea id="commentIncome" class="form-control" placeholder="" name="commentIncome" <?=
+									<textarea id="commentIncome" class="form-control" placeholder="" name="commentIncome"> <?=
 											isset($_SESSION['loaded_comment'])?
-											'value="'.$_SESSION['loaded_comment'].'"' : ''
-									?>></textarea>
+											$_SESSION['loaded_comment'] : ''
+									?></textarea>
 								</div>
 							</div>
 							<div id="addIncomeFunctionMessage" class="text-danger col-sm-12 text-center mb-2">

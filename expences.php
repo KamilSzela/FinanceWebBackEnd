@@ -55,7 +55,7 @@
 			$_SESSION['added_expence_message'] = 'Proszę wybrać kategorię dodawanego wydatku';
 		}
 		
-		$_SESSION['loaded_comment']=$_POST['commentExpence'];
+		$_SESSION['loaded_comment'] = filter_input(INPUT_POST, 'commentExpence', FILTER_SANITIZE_SPECIAL_CHARS);
 		
 		if($invalidData==false){
 				$userId = $_SESSION['logged_User_Id'];
@@ -135,7 +135,10 @@
 								<div class="col-sm-12 mb-2">
 									<p>Kwota wydatku: </p>
 									<div class="input-group">
-										<input type="text" class="form-control" placeholder="Podaj kwotę wydatku" name="expenceAmount">
+										<input type="text" class="form-control" placeholder="Podaj kwotę wydatku" name="expenceAmount" <?=
+											isset($_SESSION['loaded_amount'])?
+											'value="'.$_SESSION['loaded_amount'].'"' : ''
+									?>>
 										<div class="input-group-append">
 											<span class="input-group-text"> PLN </span>
 										</div>
@@ -144,7 +147,10 @@
 								<div class="col-sm-12 mb-2">
 									<div class="form-group">
 										<p>Data wydatku:</p>
-										<input type="date" class="form-control" name="dateExpence">
+										<input type="date" class="form-control" name="dateExpence" <?=
+											isset($_SESSION['loaded_date'])?
+											'value="'.$_SESSION['loaded_date'].'"' : ''
+									?>>
 									</div>
 								</div>
 								<div class="col-sm-12 mb-2 border border-success">
@@ -176,7 +182,10 @@
 								<div class="col-sm-12 mb-2">
 									<div class="form-group">
 										<p>Komentarz(opcjonalnie):</p>
-										<textarea class="form-control" placeholder="" name="commentExpence"></textarea>
+										<textarea class="form-control" placeholder="" name="commentExpence"> <?=
+											isset($_SESSION['loaded_comment'])?
+											$_SESSION['loaded_comment'] : ''
+									?></textarea>
 									</div>
 								</div>
 							
