@@ -4,17 +4,77 @@
 		header('Location:index.php');
 		exit();
 	}
+	else{
+		require_once 'database.php';
+		$user_id = $_SESSION['logged_User_Id'];
+		$get_payment_ways_Query = $db->prepare('SELECT id,name FROM payment_methods_assigned_to_users WHERE user_id = :id');
+		$get_payment_ways_Query->bindValue(':id', $user_id, PDO::PARAM_INT);
+		$get_payment_ways_Query->execute();
 	
-	echo $_POST['expenceAmount'];
-	echo $_POST['expenceCat'];
-	echo $_POST['commentExpence'];
-	echo $_POST['payment'];
-	echo $_POST['dateExpence'];
-	unset($_POST['expenceCat']);
-	unset($_POST['expenceAmount']);
-	unset($_POST['commentExpence']);
-	unset($_POST['payment']);
-	unset($_POST['dateExpence']);
+		$users_payment_methods = $get_payment_ways_Query->fetchAll();
+
+		$get_cathegories_Query = $db->prepare('SELECT id,name FROM expenses_category_assigned_to_users WHERE user_id = :id');
+		$get_cathegories_Query->bindValue(':id', $user_id, PDO::PARAM_INT);
+		$get_cathegories_Query->execute();
+		
+		$users_Cathegories = $get_cathegories_Query->fetchAll();
+	}
+	
+	$invalidData = false;
+	
+	if(isset($_POST['expenceAmount'])==true){
+		$expenceAmount = preg_replace("/[^0-9.,]/", "", $_POST['expenceAmount']);
+		
+		if($expenceAmount!=$_POST['expenceAmount']||$expenceAmount==""){
+			$_SESSION['added_expence_message'] = 'Kwota wydatku powinna zawierać jedynie cyfry i znak "." lub ","';
+			$invalidData = true;
+		}
+		
+		if($invalidData==false){
+			$expenceAmountCommaReplacement = str_replace(',','.',$expenceAmount);
+			$expenceFloatFormat = floatval($expenceAmountCommaReplacement);
+			//$checktype = is_float($incomeDoubleFormat);
+			//$_SESSION['added_income_message'] = 'czy float:'.$checktype.', wartość:'.$incomeDoubleFormat;
+		}	
+		$_SESSION['loaded_amount']=$_POST['expenceAmount'];
+		
+		if($invalidData==false){
+			$dateValue = preg_replace("/[^0-9\-]/","",$_POST['dateExpence']);
+			if($dateValue!=$_POST['dateExpence']||$dateValue==""){
+				$invalidData = true;
+				$_SESSION['added_expence_message'] = 'Proszę wpisać datę w formacie rrrr-mm-dd';
+			}
+		}
+		$_SESSION['loaded_date']=$_POST['dateExpence'];
+		if(!isset($_POST['payment'])){
+			$invalidData = true;
+			$_SESSION['added_expence_message'] = 'Proszę sposób płatności wydatku';
+		}
+		if(!isset($_POST['expenceCat'])){
+			$invalidData = true;
+			$_SESSION['added_expence_message'] = 'Proszę wybrać kategorię dodawanego wydatku';
+		}
+		
+		$_SESSION['loaded_comment']=$_POST['commentExpence'];
+		
+		if($invalidData==false){
+				$userId = $_SESSION['logged_User_Id'];
+				$cathegory_assigned_to_user = $_POST['expenceCat'];
+				$payment_way_assigned_to_user = $_POST['payment'];
+			if(isset($_POST['commentExpence'])&&$_POST['commentExpence']!=""){
+				$comment = filter_input(INPUT_POST, 'commentExpence', FILTER_SANITIZE_SPECIAL_CHARS);
+				$insert_income_query = $db->exec("INSERT INTO expenses VALUES(NULL, '$userId', '$cathegory_assigned_to_user', '$payment_way_assigned_to_user', '$expenceFloatFormat','$dateValue','$comment')");
+				$_SESSION['added_expence_message'] = '<p class="text-success">Dodano nowy wydatek do Twojej bazy danych!</p>';
+			}
+			else{
+				$insert_income_query = $db->exec("INSERT INTO incomes VALUES(NULL, '$userId', '$cathegory_assigned_to_user', '$payment_way_assigned_to_user', '$incomeFloatFormat','$dateValue',\"\")");
+				$_SESSION['added_income_message'] = '<p class="text-success">Dodano nowy wydatek do Twojej bazy danych!</p>';
+			}
+			unset($_SESSION['loaded_amount']);
+			unset($_SESSION['loaded_date']);
+			unset($_SESSION['loaded_comment']);
+		}
+	}
 ?>
 
 <!DOCTYPE html>
@@ -90,92 +150,27 @@
 								<div class="col-sm-12 mb-2 border border-success">
 									<div id="expencePaymentWay" class="form-group">
 										<p>Sposób płatności:</p>
-										<div class="custom-control custom-radio" id="Gotówka">
-											<input type="radio" class="custom-control-input" id="money" value="Gotówka" name="payment">
-											<label class="custom-control-label" for="money"> Gotówka </label>
-										</div>
-										<div class="custom-control custom-radio" id="KartaDebetowa">
-											<input type="radio" class="custom-control-input" id="debetCard" value="KartaDebetowa" name="payment">
-											<label class="custom-control-label" for="debetCard"> Karta Debetowa </label>
-										</div>
-										<div class="custom-control custom-radio" id="KartaKredytowa">
-											<input type="radio" class="custom-control-input" id="creditCard" value="KartaKredytowa" name="payment">
-											<label class="custom-control-label" for="creditCard"> Karta Kredytowa </label>
-										</div>
+										<?php
+										foreach($users_payment_methods as $payment){
+											echo '<div class="custom-control custom-radio light-input-bg">';
+											echo '<input type="radio" class="custom-control-input" id="'.$payment['name'] .'" value="'.$payment['id'].'" name="payment">';
+											echo '<label class="custom-control-label" for="'.$payment['name'].'">'.$payment['name'].'</label>';
+											echo '</div>';
+										}										
+										?>	
 									</div>
 								</div>
 								<div class="col-sm-12 mb-2 py-2 border border-success">
 									<div id="expenceCategory" class="form-group">
 										<p>Kategoria wydatku:</p>
-										
-										<div class="custom-control custom-radio" id="Jedzenie">
-											<input type="radio" class="custom-control-input" name="expenceCat" id="eating" value="Jedzenie">
-											<label class="custom-control-label" for="eating">Jedzenie</label>
-										</div>
-										<div class="custom-control custom-radio" id="Mieszkanie">
-											<input type="radio" class="custom-control-input" name="expenceCat" id="roomPayment" value="Mieszkanie">
-											<label class="custom-control-label" for="roomPayment">Mieszkanie</label>
-										</div>
-										<div class="custom-control custom-radio" id="Transport">
-											<input type="radio" class="custom-control-input" name="expenceCat" id="vehicles" value="Transport">
-											<label class="custom-control-label" for="vehicles">Transport</label>
-										</div>
-										<div class="custom-control custom-radio" id="Telekomunikacja">
-											<input type="radio" class="custom-control-input" name="expenceCat" id="communicationMedia" value="Telekomunikacja">
-											<label class="custom-control-label" for="communicationMedia">Telekomunikacja</label>
-										</div>
-										<div class="custom-control custom-radio" id="Opiekazdrowotna">
-											<input type="radio" class="custom-control-input" name="expenceCat" id="healthCare" value="Opieka zdrowotna">
-											<label class="custom-control-label" for="healthCare">Opieka zdrowotna</label>
-										</div>
-										<div class="custom-control custom-radio" id="Ubranie">
-											<input type="radio" class="custom-control-input" name="expenceCat" id="clothing" value="Ubranie">
-											<label class="custom-control-label" for="clothing">Ubranie</label>
-										</div>
-										<div class="custom-control custom-radio" id="Higiena">
-											<input type="radio" class="custom-control-input" name="expenceCat" id="hygene" value="Higiena">
-											<label class="custom-control-label" for="hygene">Higiena</label>
-										</div>
-										<div class="custom-control custom-radio" id="Dzieci">
-											<input type="radio" class="custom-control-input" name="expenceCat" id="children" value="Dzieci">
-											<label class="custom-control-label" for="children">Dzieci</label>
-										</div>
-										<div class="custom-control custom-radio" id="Rozrywka">
-											<input type="radio" class="custom-control-input" name="expenceCat" id="entertainment" value="Rozrywka">
-											<label class="custom-control-label" for="entertainment">Rozrywka</label>
-										</div>
-										<div class="custom-control custom-radio" id="Wycieczka">
-											<input type="radio" class="custom-control-input" name="expenceCat" id="journey" value="Wycieczka">
-											<label class="custom-control-label" for="journey">Wycieczka</label>
-										</div>
-										<div class="custom-control custom-radio" id="Szkolenia">
-											<input type="radio" class="custom-control-input" name="expenceCat" id="instructions" value="Szkolenia">
-											<label class="custom-control-label" for="instructions">Szkolenia</label>
-										</div>
-										<div class="custom-control custom-radio" id="Książki">
-											<input type="radio" class="custom-control-input" name="expenceCat" id="books" value="Książki">
-											<label class="custom-control-label" for="books">Książki</label>
-										</div>
-										<div class="custom-control custom-radio" id="Oszczędności">
-											<input type="radio" class="custom-control-input" name="expenceCat" id="savings" value="Oszczędności">
-											<label class="custom-control-label" for="savings">Oszczędności</label>
-										</div>
-										<div class="custom-control custom-radio" id="Darowizna">
-											<input type="radio" class="custom-control-input" name="expenceCat" id="donation" value="Darowizna">
-											<label class="custom-control-label" for="donation">Darowizna</label>
-										</div>
-										<div class="custom-control custom-radio" id="Spłatadługów">
-											<input type="radio" class="custom-control-input" name="expenceCat" id="debtsPayment" value="Spłata długów">
-											<label class="custom-control-label" for="debtsPayment">Spłata długów</label>
-										</div>
-										<div class="custom-control custom-radio" id="Nazłotąjesieńczyliemeryturę">
-											<input type="radio" class="custom-control-input" name="expenceCat" id="retirement" value="Na złotą jesień, czyli emeryturę">
-											<label class="custom-control-label" for="retirement">Na złotą jesień, czyli emeryturę</label>
-										</div>
-										<div class="custom-control custom-radio" id="Innewydatki">
-											<input type="radio" class="custom-control-input" name="expenceCat" id="otherExpences" value="Inne wydatki">
-											<label class="custom-control-label" for="otherExpences">Inne wydatki</label>
-										</div>
+										<?php
+										foreach($users_Cathegories as $cathegorie){
+											echo '<div class="custom-control custom-radio light-input-bg">';
+											echo '<input type="radio" class="custom-control-input" id="'.$cathegorie['name'] .'" value="'.$cathegorie['id'].'" name="expenceCat">';
+											echo '<label class="custom-control-label" for="'.$cathegorie['name'].'">'.$cathegorie['name'].'</label>';
+											echo '</div>';
+										}										
+										?>	
 									</div>
 								</div>
 								<div class="col-sm-12 mb-2">
@@ -185,7 +180,14 @@
 									</div>
 								</div>
 							
-								<div id="addExpenceFunctionMessage" class="text-danger col-sm-12 text-center mb-2"></div>
+								<div id="addExpenceFunctionMessage" class="text-danger col-sm-12 text-center mb-2">
+								<?php
+									if(isset($_SESSION['added_expence_message'])){
+										echo $_SESSION['added_expence_message'];
+										unset($_SESSION['added_expence_message']);
+									}
+								?>
+								</div>
 								<div class="col-sm-12 mb-2">
 									<button type="submit" class="btn btn-success btn-block" id="addExpenceButton"><span class="fa fa-save"></span> Dodaj nowy wydatek</button>
 								</div>

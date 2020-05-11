@@ -30,7 +30,7 @@
 			//$checktype = is_float($incomeDoubleFormat);
 			//$_SESSION['added_income_message'] = 'czy float:'.$checktype.', wartość:'.$incomeDoubleFormat;
 		}	
-		$_SESSION['loaded_amount']=$incomeAmountCommaReplacement;
+		$_SESSION['loaded_amount']=$_POST['incomeAmount'];
 		if($invalidData==false){
 			$dateValue = preg_replace("/[^0-9\-]/","",$_POST['dateIncome']);
 			if($dateValue!=$_POST['dateIncome']||$dateValue==""){
@@ -38,7 +38,7 @@
 				$_SESSION['added_income_message'] = 'Proszę wpisać datę w formacie rrrr-mm-dd';
 			}
 		}
-		$_SESSION['loaded_date']=$dateValue;
+		$_SESSION['loaded_date']=$_POST['dateIncome'];
 		if(!isset($_POST['incomeCategory'])){
 			$invalidData = true;
 			$_SESSION['added_income_message'] = 'Proszę wybrać kategorię wydatku';
@@ -146,7 +146,7 @@
 									<p>Kategoria:</p>							
 									<?php
 										foreach($users_cathegories as $cathegorie){
-											echo '<div class="custom-control custom-radio">';
+											echo '<div class="custom-control custom-radio light-input-bg">';
 											echo '<input type="radio" class="custom-control-input" id="'.$cathegorie['name'] .'" value="'.$cathegorie['id'].'" name="incomeCategory">';
 											echo '<label class="custom-control-label" for="'.$cathegorie['name'].'">'.$cathegorie['name'].'</label>';
 											echo '</div>';

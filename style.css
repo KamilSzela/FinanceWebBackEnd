@@ -48,3 +48,10 @@ body
 .pt-11{
 	padding-top:11px;
 }
+.light-input-bg{
+	background-color: #fefffe61;
+	border-bottom: 1px solid #a4c1a8;
+}
+.light-input-bg:first-of-type{
+	border-top: 1px solid #a4c1a8;
+}
