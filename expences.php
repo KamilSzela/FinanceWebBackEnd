@@ -33,8 +33,6 @@
 		if($invalidData==false){
 			$expenceAmountCommaReplacement = str_replace(',','.',$expenceAmount);
 			$expenceFloatFormat = floatval($expenceAmountCommaReplacement);
-			//$checktype = is_float($incomeDoubleFormat);
-			//$_SESSION['added_income_message'] = 'czy float:'.$checktype.', wartość:'.$incomeDoubleFormat;
 		}	
 		$_SESSION['loaded_amount']=$_POST['expenceAmount'];
 		
@@ -48,7 +46,7 @@
 		$_SESSION['loaded_date']=$_POST['dateExpence'];
 		if(!isset($_POST['payment'])){
 			$invalidData = true;
-			$_SESSION['added_expence_message'] = 'Proszę sposób płatności wydatku';
+			$_SESSION['added_expence_message'] = 'Proszę podać sposób płatności';
 		}
 		if(!isset($_POST['expenceCat'])){
 			$invalidData = true;
