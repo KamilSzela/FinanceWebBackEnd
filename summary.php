@@ -4,6 +4,25 @@
 		header('Location:index.php');
 		exit();
 	}
+	if(isset($_POST['dateSpan'])){
+		$timePeriod = $_POST['dateSpan'];
+		require_once 'database.php';
+		$user_id = $_SESSION['logged_User_Id'];
+		
+		if($timePeriod=='lastMonth'){
+			$dayOfMonth = date("d");
+			$d=strtotime("- ".$dayOfMonth."Days");
+			$beginningOfMonth = date("Y-m-d", $d);
+			
+			$get_expences_query = $db->query("SELECT e.amount, e.date_of_expence, ec.name, pm.name, e.expence_comment FROM `expenses` AS e, `expenses_category_assigned_to_users` AS ec, `payment_methods_assigned_to_users` AS pm WHERE e.date_of_expence > '$beginningOfMonth' AND e.user_id='$user_id' AND e.expence_category_assigned_to_user_id = ec.id AND e.payment_method_assigned_to_user_id = pm.id GROUP BY e.expence_category_assigned_to_user_id");
+			
+			
+			$users_Expenses = $get_expences_query->fetchAll();
+			
+			print_r($users_Expenses);
+			
+		}
+	}
 ?>
 
 <!DOCTYPE html>
@@ -64,7 +83,7 @@
 									
 									<div class="col-sm-12 mb-2">
 										<div id="choosePeriodDiv" class="input-group">
-											<select class="custom-select" id="dateSpan">
+											<select class="custom-select" name="dateSpan">
 												<option value="lastMonth" selected>Obecny miesiąc</option>
 												<option value="previousMonth" >Poprzedni miesiąc</option>
 												<option value="lastYear" >Obecny rok</option>
@@ -76,18 +95,18 @@
 										<div class="row">
 											<div class="col-sm-12">
 												<label for="beginnigTimeSpan">Data początkowa</label>
-												<input type="date" id="beginnigTimeSpan" class="form-control">
+												<input type="date" name="beginnigTimeSpan" class="form-control">
 											</div>
 											<div class="col-sm-12">
 												<label for="endingTimeSpan">Data końcowa</label>
-												<input type="date" id="endingTimeSpan" class="form-control">
+												<input type="date" name="endingTimeSpan" class="form-control">
 											</div>
 											<div class="col-sm-12 text-danger text-center" id="dateMessageDiv">
 											</div>
 										</div>	
 									</div>
 									<div class="col-sm-12 mb-2">
-										<button class="btn btn-success btn-block" id="generateSummaryButton" type="button">Generuj tabele</button>
+										<button type="submit" class="btn btn-success btn-block" id="generateSummaryButton">Generuj tabele</button>
 									</div>
 									</form>
 								</div>
@@ -98,7 +117,19 @@
 								<div class="row">
 									<div class="col-sm-12">
 										<h4 class="mb-3 text-center" id="expenceTableHeader"><b>Tabela twoich wydatków:</b></h4>
-										<table id="expenceTable" class="table table-sm table-dark table-striped table-hover"></table>
+										<table id="expenceTable" class="table table-sm table-dark table-striped table-hover">
+										<?php
+											if(isset($users_Expenses)){
+												
+												echo '<thead><tr><th>Kwota</th><th>Data</th><th>Kategoria</th><th>Sposób płatności</th><th>Komentarz</th></tr></thead>';
+												echo '<tbody>';
+												foreach($users_Expenses as $expence){
+													echo '<tr><td>'.$expence[0].'</td><td>'.$expence[1].'</td><td>'.$expence[2].'</td><td>'.$expence[3].'</td><td>'.$expence[4].'</td></tr>';	
+												}
+												echo '</tbody>';
+											}
+										?>
+										</table>
 									</div>
 									<div class="col-sm-12">
 									<h4 class="mb-3 text-center" id="incomeTableHeader"><b>Tabela twoich dochodów:</b></h4>

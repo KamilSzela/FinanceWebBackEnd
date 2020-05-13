@@ -1,12 +1,12 @@
 
 $(document).ready(function(){	
 	adjustNavBar();
-	prepareSummaryBoard();	
+	//prepareSummaryBoard();
+	adjustSummaryContainerheight();	
 });
 $( window ).resize(function() {
     adjustNavBar();
 });
-
 function adjustNavBar(){
 	var screenWidth = $(window).width();
 	
@@ -17,6 +17,9 @@ function adjustNavBar(){
 		$('#navList li').addClass('w-20');
 	}
 }
+$('#generateSummaryButton').on('click',function(){
+	adjustSummaryContainerheight();
+});
 $('#dateSpan').on('change', function(){
 	prepareSummaryBoard();
 });
@@ -43,11 +46,16 @@ function prepareSummaryBoard() {
 		$('#nonStandardDateInput').addClass("d-none");
 	}
 }
-/*function adjustSummaryContainerheight(){
+function adjustSummaryContainerheight(){
 	let summaryHeight = $('#divToHeightEvaluation').height();
 	if(summaryHeight>500){
 		$('#summaryContainer').css({
 			'height': 'auto'
 		});
 	}
-}*/
+	else {
+		$('#summaryContainer').css({
+			'height': '500px'
+		});
+	}
+}
