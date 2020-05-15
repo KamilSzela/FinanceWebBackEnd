@@ -13,7 +13,7 @@
 	
 		$users_payment_methods = $get_payment_ways_Query->fetchAll();
 
-		$get_cathegories_Query = $db->prepare('SELECT id,name FROM expenses_category_assigned_to_users WHERE user_id = :id');
+		$get_cathegories_Query = $db->prepare('SELECT id,name_expence_cat FROM expenses_category_assigned_to_users WHERE user_id = :id');
 		$get_cathegories_Query->bindValue(':id', $user_id, PDO::PARAM_INT);
 		$get_cathegories_Query->execute();
 		
@@ -61,12 +61,12 @@
 				$payment_way_assigned_to_user = $_POST['payment'];
 			if(isset($_POST['commentExpence'])&&$_POST['commentExpence']!=""){
 				$comment = filter_input(INPUT_POST, 'commentExpence', FILTER_SANITIZE_SPECIAL_CHARS);
-				$insert_income_query = $db->exec("INSERT INTO expenses VALUES(NULL, '$userId', '$cathegory_assigned_to_user', '$payment_way_assigned_to_user', '$expenceFloatFormat','$dateValue','$comment')");
+				$insert_expence_query = $db->exec("INSERT INTO expenses VALUES(NULL, '$userId', '$cathegory_assigned_to_user', '$payment_way_assigned_to_user', '$expenceFloatFormat','$dateValue','$comment')");
 				$_SESSION['added_expence_message'] = '<p class="text-success">Dodano nowy wydatek do Twojej bazy danych!</p>';
 			}
 			else{
-				$insert_income_query = $db->exec("INSERT INTO incomes VALUES(NULL, '$userId', '$cathegory_assigned_to_user', '$payment_way_assigned_to_user', '$incomeFloatFormat','$dateValue',\"\")");
-				$_SESSION['added_income_message'] = '<p class="text-success">Dodano nowy wydatek do Twojej bazy danych!</p>';
+				$insert_expence_query = $db->exec("INSERT INTO expenses VALUES(NULL, '$userId', '$cathegory_assigned_to_user', '$payment_way_assigned_to_user', '$incomeFloatFormat','$dateValue',\"\")");
+				$_SESSION['added_expence_message'] = '<p class="text-success">Dodano nowy wydatek do Twojej bazy danych!</p>';
 			}
 			unset($_SESSION['loaded_amount']);
 			unset($_SESSION['loaded_date']);

@@ -13,14 +13,42 @@
 			$dayOfMonth = date("d");
 			$d=strtotime("- ".$dayOfMonth."Days");
 			$beginningOfMonth = date("Y-m-d", $d);
+			echo $beginningOfMonth;
 			
-			$get_expences_query = $db->query("SELECT e.amount, e.date_of_expence, ec.name, pm.name, e.expence_comment FROM `expenses` AS e, `expenses_category_assigned_to_users` AS ec, `payment_methods_assigned_to_users` AS pm WHERE e.date_of_expence > '$beginningOfMonth' AND e.user_id='$user_id' AND e.expence_category_assigned_to_user_id = ec.id AND e.payment_method_assigned_to_user_id = pm.id GROUP BY e.expence_category_assigned_to_user_id");
-			
-			
+			$get_expences_query = $db->query("SELECT e.amount, e.date_of_expence, ec.name_expence_cat, pm.name, e.expence_comment FROM `expenses` AS e, `expenses_category_assigned_to_users` AS ec, `payment_methods_assigned_to_users` AS pm WHERE e.date_of_expence > '$beginningOfMonth' AND e.user_id='$user_id' AND e.expence_category_assigned_to_user_id = ec.id AND e.payment_method_assigned_to_user_id = pm.id");
+			// GROUP BY e.expence_category_assigned_to_user_id"
 			$users_Expenses = $get_expences_query->fetchAll();
 			
-			print_r($users_Expenses);
+			//print_r($users_Expenses);	
+		}
+		if($timePeriod=='previousMonth'){
+			$dayOfMonth = date("d");
+			echo 'Day of month'.$dayOfMonth;
+			$d=strtotime("- ".$dayOfMonth."Days");
+			$beginningOfMonth = date("Y-m-d", $d);
+			echo '<br/>beginningOfMonth:'.$beginningOfMonth;
+			$d2 = strtotime($beginningOfMonth."-1 Months");
+			$previousMonth = date("Y-m-d",$d2);
+			echo '<br/>previousMonth:'.$previousMonth;
 			
+			$get_expences_query = $db->query("SELECT e.amount, e.date_of_expence, ec.name_expence_cat, pm.name, e.expence_comment FROM `expenses` AS e, `expenses_category_assigned_to_users` AS ec, `payment_methods_assigned_to_users` AS pm WHERE e.date_of_expence >= '$previousMonth' AND e.date_of_expence <= '$beginningOfMonth' AND e.user_id='$user_id' AND e.expence_category_assigned_to_user_id = ec.id AND e.payment_method_assigned_to_user_id = pm.id GROUP BY e.expence_category_assigned_to_user_id");
+			
+			$users_Expenses = $get_expences_query->fetchAll();
+			print_r($users_Expenses);
+		}
+		if($timePeriod=='lastYear'){
+			$dayOfMonth = date("d");
+			$month = date("m");
+			$d=strtotime("- ".$dayOfMonth."Days");
+			$beginningOfMonth = date("Y-m-d", $d);
+			$d2 = strtotime("- ".$month."Months");
+			$beginningOfYear = date("Y-m-d",$d2);
+			echo $beginningOfYear;
+			
+			$get_expences_query = $db->query("SELECT e.amount, e.date_of_expence, ec.name_expence_cat, pm.name, e.expence_comment FROM `expenses` AS e, `expenses_category_assigned_to_users` AS ec, `payment_methods_assigned_to_users` AS pm WHERE e.date_of_expence >= '$beginningOfYear' AND e.user_id='$user_id' AND e.expence_category_assigned_to_user_id = ec.id AND e.payment_method_assigned_to_user_id = pm.id GROUP BY e.expence_category_assigned_to_user_id");
+			
+			$users_Expenses = $get_expences_query->fetchAll();
+			//print_r($users_Expenses);
 		}
 	}
 ?>
