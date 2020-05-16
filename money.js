@@ -20,13 +20,15 @@ function adjustNavBar(){
 $('#generateSummaryButton').on('click',function(){
 	adjustSummaryContainerheight();
 });
-$('#dateSpan').on('change', function(){
+$('#chosenDateSpan').on('change', function(){
 	prepareSummaryBoard();
 });
 function prepareSummaryBoard() {
-	var chosenSpan = $('#dateSpan').val();
+	var chosenSpan = $('#chosenDateSpan').val();
 	$('#expenceTable').html("");
 	$('#expenceTableHeader').html("");
+	$('#expenceCategoriesTable').html("");
+	$('#expenceCategoriesTableHeader').html("");
 	$('#incomeTable').html("");
 	$('#incomeTableHeader').html("");
 	$('#chartExpencesContainer').html("");

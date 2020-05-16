@@ -13,28 +13,30 @@
 			$dayOfMonth = date("d");
 			$d=strtotime("- ".$dayOfMonth."Days");
 			$beginningOfMonth = date("Y-m-d", $d);
-			echo $beginningOfMonth;
 			
-			$get_expences_query = $db->query("SELECT e.amount, e.date_of_expence, ec.name_expence_cat, pm.name, e.expence_comment FROM `expenses` AS e, `expenses_category_assigned_to_users` AS ec, `payment_methods_assigned_to_users` AS pm WHERE e.date_of_expence > '$beginningOfMonth' AND e.user_id='$user_id' AND e.expence_category_assigned_to_user_id = ec.id AND e.payment_method_assigned_to_user_id = pm.id");
-			// GROUP BY e.expence_category_assigned_to_user_id"
+			$get_expences_query = $db->query("SELECT e.amount, e.date_of_expence, ec.name_expence_cat, pm.name, e.expence_comment FROM `expenses` AS e, `expenses_category_assigned_to_users` AS ec, `payment_methods_assigned_to_users` AS pm WHERE e.date_of_expence > '$beginningOfMonth' AND e.user_id='$user_id' AND e.expence_category_assigned_to_user_id = ec.id AND e.payment_method_assigned_to_user_id = pm.id ORDER BY e.expence_category_assigned_to_user_id");
+			 
 			$users_Expenses = $get_expences_query->fetchAll();
 			
-			//print_r($users_Expenses);	
+			$get_summary_query = $db->query("SELECT SUM(e.amount), ec.name_expence_cat FROM `expenses` AS e, `expenses_category_assigned_to_users` AS ec WHERE e.date_of_expence > '$beginningOfMonth' AND e.user_id='$user_id' AND e.expence_category_assigned_to_user_id = ec.id GROUP BY e.expence_category_assigned_to_user_id");
+			
+			$expenses_categories = $get_summary_query->fetchAll();
 		}
 		if($timePeriod=='previousMonth'){
 			$dayOfMonth = date("d");
-			echo 'Day of month'.$dayOfMonth;
 			$d=strtotime("- ".$dayOfMonth."Days");
 			$beginningOfMonth = date("Y-m-d", $d);
-			echo '<br/>beginningOfMonth:'.$beginningOfMonth;
 			$d2 = strtotime($beginningOfMonth."-1 Months");
 			$previousMonth = date("Y-m-d",$d2);
-			echo '<br/>previousMonth:'.$previousMonth;
-			
-			$get_expences_query = $db->query("SELECT e.amount, e.date_of_expence, ec.name_expence_cat, pm.name, e.expence_comment FROM `expenses` AS e, `expenses_category_assigned_to_users` AS ec, `payment_methods_assigned_to_users` AS pm WHERE e.date_of_expence >= '$previousMonth' AND e.date_of_expence <= '$beginningOfMonth' AND e.user_id='$user_id' AND e.expence_category_assigned_to_user_id = ec.id AND e.payment_method_assigned_to_user_id = pm.id GROUP BY e.expence_category_assigned_to_user_id");
+						
+			$get_expences_query = $db->query("SELECT e.amount, e.date_of_expence, ec.name_expence_cat, pm.name, e.expence_comment FROM `expenses` AS e, `expenses_category_assigned_to_users` AS ec, `payment_methods_assigned_to_users` AS pm WHERE e.date_of_expence >= '$previousMonth' AND e.date_of_expence <= '$beginningOfMonth' AND e.user_id='$user_id' AND e.expence_category_assigned_to_user_id = ec.id AND e.payment_method_assigned_to_user_id = pm.id ORDER BY e.expence_category_assigned_to_user_id");
 			
 			$users_Expenses = $get_expences_query->fetchAll();
-			print_r($users_Expenses);
+			
+			$get_summary_query = $db->query("SELECT SUM(e.amount), ec.name_expence_cat FROM `expenses` AS e, `expenses_category_assigned_to_users` AS ec WHERE e.date_of_expence >= '$previousMonth' AND e.date_of_expence <= '$beginningOfMonth' AND e.user_id='$user_id' AND e.expence_category_assigned_to_user_id = ec.id GROUP BY e.expence_category_assigned_to_user_id");
+			
+			$expenses_categories = $get_summary_query->fetchAll();
+			
 		}
 		if($timePeriod=='lastYear'){
 			$dayOfMonth = date("d");
@@ -43,12 +45,30 @@
 			$beginningOfMonth = date("Y-m-d", $d);
 			$d2 = strtotime("- ".$month."Months");
 			$beginningOfYear = date("Y-m-d",$d2);
-			echo $beginningOfYear;
 			
-			$get_expences_query = $db->query("SELECT e.amount, e.date_of_expence, ec.name_expence_cat, pm.name, e.expence_comment FROM `expenses` AS e, `expenses_category_assigned_to_users` AS ec, `payment_methods_assigned_to_users` AS pm WHERE e.date_of_expence >= '$beginningOfYear' AND e.user_id='$user_id' AND e.expence_category_assigned_to_user_id = ec.id AND e.payment_method_assigned_to_user_id = pm.id GROUP BY e.expence_category_assigned_to_user_id");
+			$get_expences_query = $db->query("SELECT e.amount, e.date_of_expence, ec.name_expence_cat, pm.name, e.expence_comment FROM `expenses` AS e, `expenses_category_assigned_to_users` AS ec, `payment_methods_assigned_to_users` AS pm WHERE e.date_of_expence >= '$beginningOfYear' AND e.user_id='$user_id' AND e.expence_category_assigned_to_user_id = ec.id AND e.payment_method_assigned_to_user_id = pm.id ORDER BY e.expence_category_assigned_to_user_id");
 			
 			$users_Expenses = $get_expences_query->fetchAll();
-			//print_r($users_Expenses);
+			
+			$get_summary_query = $db->query("SELECT SUM(e.amount), ec.name_expence_cat FROM `expenses` AS e, `expenses_category_assigned_to_users` AS ec WHERE e.date_of_expence >= '$beginningOfYear' AND e.user_id='$user_id' AND e.expence_category_assigned_to_user_id = ec.id GROUP BY e.expence_category_assigned_to_user_id");
+			
+			$expenses_categories = $get_summary_query->fetchAll();
+		
+		}
+		if($timePeriod=='nonStandardSpan'){
+			
+			$beginningOfTimePeriod = filter_input(INPUT_POST, 'beginnigTimeSpan');
+			
+			$endingOfTimePeriod = filter_input(INPUT_POST, 'endingTimeSpan');
+			
+			$get_expences_query = $db->query("SELECT e.amount, e.date_of_expence, ec.name_expence_cat, pm.name, e.expence_comment FROM `expenses` AS e, `expenses_category_assigned_to_users` AS ec, `payment_methods_assigned_to_users` AS pm WHERE e.date_of_expence >= '$beginningOfTimePeriod' AND e.date_of_expence <= '$endingOfTimePeriod' AND e.user_id='$user_id' AND e.expence_category_assigned_to_user_id = ec.id AND e.payment_method_assigned_to_user_id = pm.id ORDER BY e.expence_category_assigned_to_user_id");
+			
+			$users_Expenses = $get_expences_query->fetchAll();
+			
+			$get_summary_query = $db->query("SELECT SUM(e.amount), ec.name_expence_cat FROM `expenses` AS e, `expenses_category_assigned_to_users` AS ec WHERE e.date_of_expence >= '$beginningOfTimePeriod' AND e.date_of_expence <= '$endingOfTimePeriod' AND e.user_id='$user_id' AND e.expence_category_assigned_to_user_id = ec.id GROUP BY e.expence_category_assigned_to_user_id");
+			
+			$expenses_categories = $get_summary_query->fetchAll();
+		
 		}
 	}
 ?>
@@ -111,7 +131,7 @@
 									
 									<div class="col-sm-12 mb-2">
 										<div id="choosePeriodDiv" class="input-group">
-											<select class="custom-select" name="dateSpan">
+											<select class="custom-select" name="dateSpan" id="chosenDateSpan">
 												<option value="lastMonth" selected>Obecny miesiąc</option>
 												<option value="previousMonth" >Poprzedni miesiąc</option>
 												<option value="lastYear" >Obecny rok</option>
@@ -144,15 +164,37 @@
 							<div class="col-sm-10">
 								<div class="row">
 									<div class="col-sm-12">
-										<h4 class="mb-3 text-center" id="expenceTableHeader"><b>Tabela twoich wydatków:</b></h4>
+										<h4 class="mb-3 text-center" id="expenceTableHeader"><?php
+										if(isset($users_Expenses) && count($users_Expenses)!=0){
+											echo '<b>Tabela twoich wydatków:</b>';
+										}
+										?></h4>
 										<table id="expenceTable" class="table table-sm table-dark table-striped table-hover">
 										<?php
-											if(isset($users_Expenses)){
+											if(isset($users_Expenses) && count($users_Expenses)!=0){
 												
 												echo '<thead><tr><th>Kwota</th><th>Data</th><th>Kategoria</th><th>Sposób płatności</th><th>Komentarz</th></tr></thead>';
 												echo '<tbody>';
 												foreach($users_Expenses as $expence){
 													echo '<tr><td>'.$expence[0].'</td><td>'.$expence[1].'</td><td>'.$expence[2].'</td><td>'.$expence[3].'</td><td>'.$expence[4].'</td></tr>';	
+												}
+												echo '</tbody>';
+											}
+										?>
+										</table>
+										<h4 class="mb-3 text-center" id="expenceCategoriesTableHeader"><?php
+										if(isset($users_Expenses) && count($users_Expenses)!=0){
+											echo '<b>Tabela podsumowująca twoje wydatki względem kategorii:</b>';
+										}
+										?></h4>
+										<table id="expenceCategoriesTable" class="table table-sm table-dark table-striped table-hover">
+										<?php
+											if(isset($expenses_categories) && count($expenses_categories)!=0){
+												
+												echo '<thead><tr><th>Wartość w kategorii</th><th>Kategoria</th></thead>';
+												echo '<tbody>';
+												foreach($expenses_categories as $category){
+													echo '<tr><td>'.$category[0].'</td><td>'.$category[1].'</td></tr>';	
 												}
 												echo '</tbody>';
 											}
