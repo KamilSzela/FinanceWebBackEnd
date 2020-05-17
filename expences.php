@@ -170,8 +170,8 @@
 										<?php
 										foreach($users_Cathegories as $cathegorie){
 											echo '<div class="custom-control custom-radio light-input-bg">';
-											echo '<input type="radio" class="custom-control-input" id="'.$cathegorie['name'] .'" value="'.$cathegorie['id'].'" name="expenceCat">';
-											echo '<label class="custom-control-label" for="'.$cathegorie['name'].'">'.$cathegorie['name'].'</label>';
+											echo '<input type="radio" class="custom-control-input" id="'.$cathegorie['name_expence_cat'] .'" value="'.$cathegorie['id'].'" name="expenceCat">';
+											echo '<label class="custom-control-label" for="'.$cathegorie['name_expence_cat'].'">'.$cathegorie['name_expence_cat'].'</label>';
 											echo '</div>';
 										}										
 										?>	

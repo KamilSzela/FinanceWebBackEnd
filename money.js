@@ -23,12 +23,15 @@ $('#generateSummaryButton').on('click',function(){
 $('#chosenDateSpan').on('change', function(){
 	prepareSummaryBoard();
 });
+
 function prepareSummaryBoard() {
 	var chosenSpan = $('#chosenDateSpan').val();
 	$('#expenceTable').html("");
 	$('#expenceTableHeader').html("");
 	$('#expenceCategoriesTable').html("");
 	$('#expenceCategoriesTableHeader').html("");
+	$('#incomeCategoriesTableHeader').html("");
+	$('#incomeCategoriesTable').html("");
 	$('#incomeTable').html("");
 	$('#incomeTableHeader').html("");
 	$('#chartExpencesContainer').html("");
@@ -48,6 +51,7 @@ function prepareSummaryBoard() {
 		$('#nonStandardDateInput').addClass("d-none");
 	}
 }
+
 function adjustSummaryContainerheight(){
 	let summaryHeight = $('#divToHeightEvaluation').height();
 	if(summaryHeight>500){

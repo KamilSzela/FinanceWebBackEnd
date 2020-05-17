@@ -21,6 +21,15 @@
 			$get_summary_query = $db->query("SELECT SUM(e.amount), ec.name_expence_cat FROM `expenses` AS e, `expenses_category_assigned_to_users` AS ec WHERE e.date_of_expence > '$beginningOfMonth' AND e.user_id='$user_id' AND e.expence_category_assigned_to_user_id = ec.id GROUP BY e.expence_category_assigned_to_user_id");
 			
 			$expenses_categories = $get_summary_query->fetchAll();
+			
+			
+			$get_incomes_query = $db->query("SELECT i.amount, i.date_of_income, ic.name, i.income_comment FROM `incomes` AS i, `incomes_category_assigned_to_users` AS ic WHERE i.date_of_income > '$beginningOfMonth' AND i.user_id='$user_id' AND i.income_category_assigned_to_user_id = ic.id ORDER BY i.income_category_assigned_to_user_id");
+			 
+			$users_Incomes = $get_incomes_query->fetchAll();
+			
+			$get_incomes_summary_query = $db->query("SELECT SUM(i.amount), ic.name FROM `incomes` AS i, `incomes_category_assigned_to_users` AS ic WHERE i.date_of_income > '$beginningOfMonth' AND i.user_id='$user_id' AND i.income_category_assigned_to_user_id = ic.id GROUP BY i.income_category_assigned_to_user_id");
+			
+			$incomes_categories = $get_incomes_summary_query->fetchAll();
 		}
 		if($timePeriod=='previousMonth'){
 			$dayOfMonth = date("d");
@@ -37,6 +46,13 @@
 			
 			$expenses_categories = $get_summary_query->fetchAll();
 			
+			$get_incomes_query = $db->query("SELECT i.amount, i.date_of_income, ic.name, i.income_comment FROM `incomes` AS i, `incomes_category_assigned_to_users` AS ic WHERE i.date_of_income >= '$previousMonth' AND i.date_of_income <= '$beginningOfMonth' AND i.user_id='$user_id' AND i.income_category_assigned_to_user_id = ic.id ORDER BY i.income_category_assigned_to_user_id");
+			 
+			$users_Incomes = $get_incomes_query->fetchAll();
+			
+			$get_incomes_summary_query = $db->query("SELECT SUM(i.amount), ic.name FROM `incomes` AS i, `incomes_category_assigned_to_users` AS ic WHERE i.date_of_income >= '$previousMonth' AND i.date_of_income <= '$beginningOfMonth' AND i.user_id='$user_id' AND i.income_category_assigned_to_user_id = ic.id GROUP BY i.income_category_assigned_to_user_id");
+			
+			$incomes_categories = $get_incomes_summary_query->fetchAll();
 		}
 		if($timePeriod=='lastYear'){
 			$dayOfMonth = date("d");
@@ -54,22 +70,49 @@
 			
 			$expenses_categories = $get_summary_query->fetchAll();
 		
+			$get_incomes_query = $db->query("SELECT i.amount, i.date_of_income, ic.name, i.income_comment FROM `incomes` AS i, `incomes_category_assigned_to_users` AS ic WHERE i.date_of_income >= '$beginningOfYear' AND i.user_id='$user_id' AND i.income_category_assigned_to_user_id = ic.id ORDER BY i.income_category_assigned_to_user_id");
+			 
+			$users_Incomes = $get_incomes_query->fetchAll();
+			
+			$get_incomes_summary_query = $db->query("SELECT SUM(i.amount), ic.name FROM `incomes` AS i, `incomes_category_assigned_to_users` AS ic WHERE i.date_of_income >= '$beginningOfYear' AND i.user_id='$user_id' AND i.income_category_assigned_to_user_id = ic.id GROUP BY i.income_category_assigned_to_user_id");
+			
+			$incomes_categories = $get_incomes_summary_query->fetchAll();
 		}
 		if($timePeriod=='nonStandardSpan'){
 			
 			$beginningOfTimePeriod = filter_input(INPUT_POST, 'beginnigTimeSpan');
-			
 			$endingOfTimePeriod = filter_input(INPUT_POST, 'endingTimeSpan');
+			$d1=strtotime($beginningOfTimePeriod);
+			$d2=strtotime($endingOfTimePeriod);
+			$diff=$d2-$d1;
 			
-			$get_expences_query = $db->query("SELECT e.amount, e.date_of_expence, ec.name_expence_cat, pm.name, e.expence_comment FROM `expenses` AS e, `expenses_category_assigned_to_users` AS ec, `payment_methods_assigned_to_users` AS pm WHERE e.date_of_expence >= '$beginningOfTimePeriod' AND e.date_of_expence <= '$endingOfTimePeriod' AND e.user_id='$user_id' AND e.expence_category_assigned_to_user_id = ec.id AND e.payment_method_assigned_to_user_id = pm.id ORDER BY e.expence_category_assigned_to_user_id");
+			if($diff<0){
+				$_SESSION['dateMessage'] = '<p class="text-danger">Data końca okresu nie moze być mniejsza niż data początku okresu!</p>';
+			}
+			else{
+				$get_expences_query = $db->query("SELECT e.amount, e.date_of_expence, ec.name_expence_cat, pm.name, e.expence_comment FROM `expenses` AS e, `expenses_category_assigned_to_users` AS ec, `payment_methods_assigned_to_users` AS pm WHERE e.date_of_expence >= '$beginningOfTimePeriod' AND e.date_of_expence <= '$endingOfTimePeriod' AND e.user_id='$user_id' AND e.expence_category_assigned_to_user_id = ec.id AND e.payment_method_assigned_to_user_id = pm.id ORDER BY e.expence_category_assigned_to_user_id");
+				
+				$users_Expenses = $get_expences_query->fetchAll();
+				
+				$get_summary_query = $db->query("SELECT SUM(e.amount), ec.name_expence_cat FROM `expenses` AS e, `expenses_category_assigned_to_users` AS ec WHERE e.date_of_expence >= '$beginningOfTimePeriod' AND e.date_of_expence <= '$endingOfTimePeriod' AND e.user_id='$user_id' AND e.expence_category_assigned_to_user_id = ec.id GROUP BY e.expence_category_assigned_to_user_id");
+				
+				$expenses_categories = $get_summary_query->fetchAll();
+				
+				$get_incomes_query = $db->query("SELECT i.amount, i.date_of_income, ic.name, i.income_comment FROM `incomes` AS i, `incomes_category_assigned_to_users` AS ic WHERE i.date_of_income >= '$beginningOfTimePeriod' AND i.date_of_income <= '$endingOfTimePeriod' AND i.user_id='$user_id' AND i.income_category_assigned_to_user_id = ic.id ORDER BY i.income_category_assigned_to_user_id");
+			 
+				$users_Incomes = $get_incomes_query->fetchAll();
 			
-			$users_Expenses = $get_expences_query->fetchAll();
+				$get_incomes_summary_query = $db->query("SELECT SUM(i.amount), ic.name FROM `incomes` AS i, `incomes_category_assigned_to_users` AS ic WHERE i.date_of_income >= '$beginningOfTimePeriod' AND i.date_of_income <= '$endingOfTimePeriod' AND i.user_id='$user_id' AND i.income_category_assigned_to_user_id = ic.id GROUP BY i.income_category_assigned_to_user_id");
 			
-			$get_summary_query = $db->query("SELECT SUM(e.amount), ec.name_expence_cat FROM `expenses` AS e, `expenses_category_assigned_to_users` AS ec WHERE e.date_of_expence >= '$beginningOfTimePeriod' AND e.date_of_expence <= '$endingOfTimePeriod' AND e.user_id='$user_id' AND e.expence_category_assigned_to_user_id = ec.id GROUP BY e.expence_category_assigned_to_user_id");
-			
-			$expenses_categories = $get_summary_query->fetchAll();
-		
+				$incomes_categories = $get_incomes_summary_query->fetchAll();
+			}
 		}
+		if(count($users_Expenses)==0){
+				$_SESSION['no_Expences']="<tbody><tr><td class=\"text-center\">Brak wydatków w rozpatrywanym okresie</td></tr></tbody>";
+			}
+		if(count($users_Incomes)==0){
+				$_SESSION['no_Incomes']="<tbody><tr><td class=\"text-center\">Brak dochodów w rozpatrywanym okresie</td></tr></tbody>";
+			}
 	}
 ?>
 
@@ -142,17 +185,24 @@
 									<div id="nonStandardDateInput" class="d-none col-sm-12 mb-2 justify-content-center">
 										<div class="row">
 											<div class="col-sm-12">
-												<label for="beginnigTimeSpan">Data początkowa</label>
-												<input type="date" name="beginnigTimeSpan" class="form-control">
+												<label for="beginDateInput">Data początkowa</label>
+												<input type="date" id="beginDateInput" name="beginnigTimeSpan" class="form-control">
 											</div>
 											<div class="col-sm-12">
-												<label for="endingTimeSpan">Data końcowa</label>
-												<input type="date" name="endingTimeSpan" class="form-control">
+												<label for="endingDateInput">Data końcowa</label>
+												<input type="date" id="endingDateInput" name="endingTimeSpan" class="form-control">
 											</div>
-											<div class="col-sm-12 text-danger text-center" id="dateMessageDiv">
-											</div>
+											
 										</div>	
 									</div>
+									<div class="col-sm-12 text-danger text-center" id="dateMessageDiv">
+											<?php
+												if(isset($_SESSION['dateMessage'])){
+													echo $_SESSION['dateMessage'];
+													unset($_SESSION['dateMessage']);
+												}
+											?>
+											</div>
 									<div class="col-sm-12 mb-2">
 										<button type="submit" class="btn btn-success btn-block" id="generateSummaryButton">Generuj tabele</button>
 									</div>
@@ -173,12 +223,18 @@
 										<?php
 											if(isset($users_Expenses) && count($users_Expenses)!=0){
 												
-												echo '<thead><tr><th>Kwota</th><th>Data</th><th>Kategoria</th><th>Sposób płatności</th><th>Komentarz</th></tr></thead>';
+												echo '<thead><tr><th class="text-center">Kwota</th><th class="text-center">Data</th><th class="text-center">Kategoria</th><th class="text-center">Sposób płatności</th><th class="text-center">Komentarz</th></tr></thead>';
 												echo '<tbody>';
 												foreach($users_Expenses as $expence){
-													echo '<tr><td>'.$expence[0].'</td><td>'.$expence[1].'</td><td>'.$expence[2].'</td><td>'.$expence[3].'</td><td>'.$expence[4].'</td></tr>';	
+													echo '<tr><td class="text-center">'.$expence[0].'</td><td class="text-center">'.$expence[1].'</td><td class="text-center">'.$expence[2].'</td><td class="text-center">'.$expence[3].'</td><td class="text-center">'.$expence[4].'</td></tr>';	
 												}
 												echo '</tbody>';
+											}
+											else{
+												if(isset($_SESSION['no_Incomes'])){
+													echo $_SESSION['no_Expences'];
+													unset($_SESSION['no_Expences']);
+												}
 											}
 										?>
 										</table>
@@ -191,10 +247,10 @@
 										<?php
 											if(isset($expenses_categories) && count($expenses_categories)!=0){
 												
-												echo '<thead><tr><th>Wartość w kategorii</th><th>Kategoria</th></thead>';
+												echo '<thead><tr><th class="text-center">Wartość w kategorii</th><th class="text-center">Kategoria</th></thead>';
 												echo '<tbody>';
 												foreach($expenses_categories as $category){
-													echo '<tr><td>'.$category[0].'</td><td>'.$category[1].'</td></tr>';	
+													echo '<tr><td class="text-center">'.$category[0].'</td><td class="text-center">'.$category[1].'</td></tr>';	
 												}
 												echo '</tbody>';
 											}
@@ -202,8 +258,48 @@
 										</table>
 									</div>
 									<div class="col-sm-12">
-									<h4 class="mb-3 text-center" id="incomeTableHeader"><b>Tabela twoich dochodów:</b></h4>
-										<table id="incomeTable" class="table table-sm table-dark table-striped table-hover"></table>
+									<h4 class="mb-3 text-center" id="incomeTableHeader"><?php
+										if(isset($users_Incomes) && count($users_Incomes)!=0){
+											echo '<b>Tabela twoich dochodów:</b>';
+										}
+										?></h4>
+										<table id="incomeTable" class="table table-sm table-dark table-striped table-hover">
+										<?php
+											if(isset($users_Incomes) && count($users_Incomes)!=0){
+												
+												echo '<thead><tr><th class="text-center">Kwota</th><th class="text-center">Data</th><th class="text-center">Kategoria</th><th class="text-center">Komentarz</th></tr></thead>';
+												echo '<tbody>';
+												foreach($users_Incomes as $income){
+													echo '<tr><td class="text-center">'.$income[0].'</td><td class="text-center">'.$income[1].'</td><td class="text-center">'.$income[2].'</td><td class="text-center">'.$income[3].'</td></tr>';	
+												}
+												echo '</tbody>';
+											}
+											else{
+												if(isset($_SESSION['no_Incomes'])){
+													echo $_SESSION['no_Incomes'];
+													unset($_SESSION['no_Incomes']);
+												}
+											}
+										?>
+										</table>
+										<h4 class="mb-3 text-center" id="incomeCategoriesTableHeader"><?php
+										if(isset($users_Incomes) && count($users_Incomes)!=0){
+											echo '<b>Tabela podsumowująca twoje dochody względem kategorii:</b>';
+										}
+										?></h4>
+										<table id="incomeCategoriesTable" class="table table-sm table-dark table-striped table-hover">
+										<?php
+											if(isset($incomes_categories) && count($incomes_categories)!=0){
+												
+												echo '<thead><tr><th class="text-center">Wartość w kategorii</th><th class="text-center">Kategoria</th></thead>';
+												echo '<tbody>';
+												foreach($incomes_categories as $category){
+													echo '<tr><td class="text-center">'.$category[0].'</td><td class="text-center">'.$category[1].'</td></tr>';	
+												}
+												echo '</tbody>';
+											}
+										?>
+										</table>
 									</div>
 									<div class="col-sm-12 text-center mb-2 pt-2" id="showEvaluation">
 									
