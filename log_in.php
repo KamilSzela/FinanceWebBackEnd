@@ -19,6 +19,8 @@
 			$login = filter_input(INPUT_POST, 'login', FILTER_SANITIZE_SPECIAL_CHARS);
 			$password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_SPECIAL_CHARS);
 			$email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+			$_SESSION['set_login'] = $login;
+			$_SESSION['set_email'] = $email;
 			
 			$user_Login_Query = $db->prepare('SELECT * FROM users WHERE username =:login');
 			$user_Login_Query->bindValue(':login', $login, PDO::PARAM_STR);
@@ -28,6 +30,7 @@
 			
 			if(empty($user)) {
 				$_SESSION['login_error'] = 'Nie znaleziono podanego loginu';
+				
 				header('Location: index.php');
 				exit();
 			}
@@ -37,6 +40,7 @@
 				exit();
 			}
 			if($email != $user['email']){
+				$_SESSION['set_email'] = $email;
 				$_SESSION['email_error'] = 'Błędnie wprowadzony adres email';
 				header('Location: index.php');
 				exit();
@@ -46,6 +50,8 @@
 			
 			if(password_verify($password, $user['password'])){
 				$_SESSION['logged_User_Id'] = $user['id'];
+				unset($_SESSION['set_email']);
+				unset($_SESSION['set_login']);
 				header('Location: main.php');
 			} else {
 				//invalid login attempt
