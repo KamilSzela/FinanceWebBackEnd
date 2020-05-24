@@ -54,7 +54,10 @@
 					<div class="input-group-prepend">
 						<span class="fa fa-user input-group-text fa-22-font"></span>
 					</div>
-					<input class="form-control" id="name" type="text" name="login" placeholder="Login"></input>
+					<input class="form-control" id="name" type="text" name="login" placeholder="Login" <?=
+						isset($_SESSION['set_login'])?
+							 'value="'.$_SESSION['set_login'].'"' : ''
+					?>></input>
 				</div>
 				
 				<div class="input-group mb-2">
@@ -68,7 +71,10 @@
 					<div class="input-group-prepend">
 						<span class="input-group-text fa fa-envelope fa-22-font"></span>
 					</div>
-					<input class="form-control" id="email" type="text" name="email" placeholder="Email"></input>
+					<input class="form-control" id="email" type="text" name="email" placeholder="Email" <?=
+						isset($_SESSION['set_email'])?
+							 'value="'.$_SESSION['set_email'].'"' : ''
+					?>></input>
 				</div>
 				
 				<div class="col-sm-12 text-center text-danger mb-2" id="loginFunctionMessage"><?php
@@ -101,6 +107,6 @@
 	<!--Bootstrap-->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
-	<script src="budzet.js"></script> 
+	<script src="navbar_resizing.js"></script>
 	<body>
 	<html>

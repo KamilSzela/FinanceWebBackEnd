@@ -52,27 +52,82 @@
 				
 			</div>
 			<div class="col-sm-12">
-				
-				<div class="row mt-3" id="initialContent">
-					<div class="col-lg-5 col-md-12">
-						
-						<p class="text-justify">Aplikacja Bezpożyczek.pl jest prostą w obsłudze aplikacją mobilną, dzieki której zapanujesz nad swoim budżetem. Zawartość została następująco pogrupowana: </p>
-						<ul class="list-group">
-							<li class="list-group-item bg-none text-justify"><span class="fa fa-money text-success"></span> Zakładka Nowy dochód służy dodawaniu nowego, skategoryzowanego dochodu do twojego archiwum</li>
-							<li class="list-group-item bg-none text-justify"><span class="fa fa-money text-success"></span> Zakładka Nowy wydatek umożliwia dodanie nowego, skategoryzowanego wydatku do twojego archiwum</li>
-							<li class="list-group-item bg-none text-justify"><span class="fa fa-money text-success"></span> Zakładka Bilans umożliwia przeglądanie ruchu twoich pieniędzy</li>
-							<li class="list-group-item bg-none text-justify"><span class="fa fa-money text-success"></span> Zakładka ustawienia pozwala na zmianę danych logowania, jak również edytowanie menu wprowadzania dochodów/wydatków</li>
-						</ul>
+				<div class="row" id="summaryContainer">
+					<div class="col-sm-12" id="divToHeightEvaluation">
+						<div class="row justify-content-center">
+							<div class="col-md-6 col-sm-12">
+								<div class="row">
+									<form method="post">
+									<div class="col-sm-12 my-2">
+										<h4 class="text-center"><b>Podsumowanie wydatków oraz dochodów za podany okres</b></h4>
+									</div>
+									
+									<div class="col-sm-12 mb-2">
+										<div id="choosePeriodDiv" class="input-group">
+											<select class="custom-select" name="dateSpan" id="chosenDateSpan">
+												<option value="lastMonth" selected>Obecny miesiąc</option>
+												<option value="previousMonth" >Poprzedni miesiąc</option>
+												<option value="lastYear" >Obecny rok</option>
+												<option value="nonStandardSpan" >Wybierz niestandardowy okres</option>
+											</select>
+										</div>
+									</div>
+									<div id="nonStandardDateInput" class="d-none col-sm-12 mb-2 justify-content-center">
+										<div class="row">
+											<div class="col-sm-12">
+												<label for="beginDateInput">Data początkowa</label>
+												<input type="date" id="beginDateInput" name="beginnigTimeSpan" class="form-control">
+											</div>
+											<div class="col-sm-12">
+												<label for="endingDateInput">Data końcowa</label>
+												<input type="date" id="endingDateInput" name="endingTimeSpan" class="form-control">
+											</div>
+											
+										</div>	
+									</div>
+									<div class="col-sm-12 text-danger text-center" id="dateMessageDiv">
+									</div>
+									<div class="col-sm-12 mb-2">
+										<button type="button" class="btn btn-success btn-block" id="generateSummaryButton">Generuj tabele</button>
+									</div>
+									</form>
+								</div>
+							</div>
+						</div>
+						<div class="row justify-content-center">
+							<div class="col-sm-10">
+								<div class="row">
+									<div class="col-sm-12">
+										<h4 class="mb-3 text-center" id="expenceTableHeader"></h4>
+										<table id="expenceTable" class="table table-sm table-dark table-striped table-hover">
+										
+										</table>
+										<h4 class="mb-3 text-center" id="expenceCategoriesTableHeader">
+										</h4>
+										<table id="expenceCategoriesTable" class="table table-sm table-dark table-striped table-hover">
+										
+										</table>
+									</div>
+									<div class="col-sm-12">
+									<h4 class="mb-3 text-center" id="incomeTableHeader"></h4>
+										<table id="incomeTable" class="table table-sm table-dark table-striped table-hover">
+										
+										</table>
+										<h4 class="mb-3 text-center" id="incomeCategoriesTableHeader"></h4>
+										<table id="incomeCategoriesTable" class="table table-sm table-dark table-striped table-hover">										
+										</table>
+									</div>
+									
+									<div class="col-sm-12">
+										<div id="chartExpencesContainer"></div>
+									</div>
+									<div class="col-sm-12 text-center mb-2 pt-2" id="showEvaluation">									
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
-					<div class="col-lg-7 col-md-12 align-self-center">
-						<figure class="figure">
-							<img src="img/sharon-mccutcheon-8lnbXtxFGZw-unsplash.jpg" class="figure-img img-fluid rounded" alt="PLaceholder">
-							<figcaption class="figure-caption text-right">Photo by Sharon McCutcheon on Unsplash</figcaption>
-						</figure>
-						<!--Photo by Sharon McCutcheon on Unsplash-->
-					</div>
-				</div>				
-				
+				</div>
 			</div>
 		</div>
 		
@@ -84,7 +139,9 @@
 	<!--Bootstrap-->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+	
 	<script src="navbar_resizing.js"></script>
+	<script src="tables.js"></script> 
 	
 </body>
 </html>

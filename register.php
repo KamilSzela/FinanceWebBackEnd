@@ -5,6 +5,7 @@
 		$successful_validation = true;
 		
 		$login = $_POST['login'];
+		$_SESSION['set_login'] = $login;
 		
 		if(strlen($login)<3 || strlen($login)>20){
 			$successful_validation = false;
@@ -16,6 +17,7 @@
 		}
 		
 		$email = $_POST['email'];
+		$_SESSION['set_email'] = $email;
 		$email_After_Sanitization = filter_var($email, FILTER_SANITIZE_EMAIL);
 		$email_After_Validation = filter_var($email_After_Sanitization, FILTER_VALIDATE_EMAIL);
 		
@@ -69,6 +71,8 @@
 				}
 				
 				if($successful_validation == true){
+					unset($_SESSION['set_email']);
+					unset($_SESSION['set_login']);
 					$insert_Query = $db->prepare('INSERT INTO users VALUES (NULL, :username, :password, :email)');
 					$insert_Query->bindValue(':username', $login, PDO::PARAM_STR);
 					$insert_Query->bindValue(':password', $password_hash, PDO::PARAM_STR);
@@ -137,7 +141,11 @@
 					<div class="input-group-prepend">
 						<span class="fa fa-user input-group-text fa-22-font pt-11"></span>
 					</div>
-					<input class="form-control form-control-lg" type="text" name="login" placeholder="Login"></input>
+					<input class="form-control form-control-lg" type="text" name="login" placeholder="Login" 
+					<?=
+						isset($_SESSION['set_login'])?
+							 'value="'.$_SESSION['set_login'].'"' : ''
+					?>></input>
 				</div>
 				<?php
 					if(isset($_SESSION['login_error'])){
@@ -168,7 +176,12 @@
 					<div class="input-group-prepend">
 						<span class="input-group-text fa fa-envelope fa-22-font pt-11"></span>
 					</div>
-					<input class="form-control form-control-lg" type="text" name="email" placeholder="Email"></input>
+					<input class="form-control form-control-lg" type="text" name="email" placeholder="Email" 
+					<?=
+						isset($_SESSION['set_email'])?
+							 'value="'.$_SESSION['set_email'].'"' : ''
+					?>
+					></input>
 				</div>
 				<?php
 					if(isset($_SESSION['email_error'])){
@@ -191,6 +204,6 @@
 	<!--Bootstrap-->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
-	<script src="budzet.js"></script> 
+	
 	<body>
 	<html>
