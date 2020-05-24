@@ -114,16 +114,14 @@
 										
 										</table>
 										<h4 class="mb-3 text-center" id="incomeCategoriesTableHeader"></h4>
-										<table id="incomeCategoriesTable" class="table table-sm table-dark table-striped table-hover">
-										
+										<table id="incomeCategoriesTable" class="table table-sm table-dark table-striped table-hover">										
 										</table>
 									</div>
 									
-									<div class="col-sm-12 text-center mb-2 pt-2" id="showEvaluation">
-									
-									</div>
 									<div class="col-sm-12">
 										<div id="chartExpencesContainer"></div>
+									</div>
+									<div class="col-sm-12 text-center mb-2 pt-2" id="showEvaluation">									
 									</div>
 								</div>
 							</div>
@@ -141,7 +139,8 @@
 	<!--Bootstrap-->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
-	<script src="money.js"></script> 
+	
+	<script src="navbar_resizing.js"></script>
 	<script src="tables.js"></script> 
 	
 </body>
