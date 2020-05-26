@@ -90,6 +90,10 @@
 						echo '<p>'.$_SESSION['email_error'].'</p>';
 						unset($_SESSION['email_error']);
 					}
+					if(isset($_SESSION['successful_registration'])){
+						echo '<p class="text-success light-input-bg">Twoje konto zostało założone! Zaloguj się aby je wypróbować</p>';
+						unset($_SESSION['successful_registration']);
+					}
 				?></div>
 				<input type="submit" id="signIn" class="btn btn-primary btn-block mb-2" value="Zaloguj się"></input>
 			</form>

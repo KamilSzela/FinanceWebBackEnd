@@ -92,11 +92,12 @@
 					$insert_Query3 = $db->exec("INSERT INTO incomes_category_assigned_to_users VALUES (null, '$user_id','Wynagrodzenie'),(null, '$user_id','Odsetki bankowe'),(null, '$user_id','Sprzedaż na Allegro'),(null, '$user_id','Inne źródło')");
 					
 					$insert_Query4 = $db->exec("INSERT INTO payment_methods_assigned_to_users VALUES (null, '$user_id','Gotówka'),(null, '$user_id','Karta Debetowa'),(null, '$user_id','Karta Kredytowa');");
-					/*if($insert_Query == true){
+					
+					if($insert_Query == true){
 						$_SESSION['successful_registration']=true;
-						echo 'zarejestrowałeś się - oooooooooooo';
-						//header('Location:main.php');
-					}*/
+						
+						header('Location:index.php');
+					}
 				}
 				
 			}
